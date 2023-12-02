@@ -35,6 +35,7 @@ export default function CatSprite({ codeBlocks }) {
         console.log(messageText,'messageText')
         if (block.duration) {
           console.log('hiii duration');
+          setMessage(messageText);
           const timeoutId = setTimeout(() => {
             setMessage(null);
           }, block.duration);
