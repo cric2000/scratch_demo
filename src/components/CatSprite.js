@@ -1,7 +1,66 @@
 import React from "react";
+import { useState, useEffect } from "react";
 
-export default function CatSprite() {
+
+export default function CatSprite({ codeBlocks }) {
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [rotation, setRotation] = useState(0);
+  const [message, setMessage] = useState(null);
+
+
+  useEffect(() => {
+    codeBlocks.forEach((block) => {
+      console.log(block.text,'hiii')
+      console.log(block.duration)
+      const moveMatch = block.text.match(/Move (\d+) steps/);
+      if (moveMatch) {
+        const steps = parseInt(moveMatch[1], 10);
+        setPosition((prevPosition) => ({ x: prevPosition.x + steps, y: prevPosition.y }));
+      }
+  
+      const turnMatch = block.text.match(/Turn (\d+) degrees/);
+      if (turnMatch) {
+        console.log('anmol')
+        const degrees = parseInt(turnMatch[1], 10);
+        setRotation((prevRotation) => prevRotation + degrees);
+      }
+
+      console.log(block.type)
+      if(block.type.startsWith("look")){
+        const showMessageMatch = block.text.match(/(.+)/);
+      console.log(showMessageMatch,'showMessageMatch')
+      if (showMessageMatch) {
+        
+        const messageText = showMessageMatch.input;
+        console.log(messageText,'messageText')
+        if (block.duration) {
+          console.log('hiii duration');
+          const timeoutId = setTimeout(() => {
+            setMessage(null);
+          }, block.duration);
+
+          block.duration=0
+          return () => {
+            clearTimeout(timeoutId);
+          };
+        } else {
+          console.log('here',messageText)
+          setMessage(messageText);
+        }
+        
+      }
+    }
+    
+    });
+  }, [codeBlocks]);
+  
   return (
+    <div style={{ transform: `translate(${position.x}px, ${position.y}px) rotate(${rotation}deg)`, transition: "transform 0.5s" }}>
+      {message && (
+        <div style={{ position: "absolute", top: "20%", left: "20%", transform: "translateX(-20%)", textAlign: "center" }} className="bg-gray-500 text-white rounded-xl px-2 py-1 my-2 text-sm">
+          {message}
+        </div>
+      )}
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width="95.17898101806641"
@@ -9,6 +68,7 @@ export default function CatSprite() {
       viewBox="0.3210171699523926 0.3000000357627869 95.17898101806641 100.04156036376953"
       version="1.1"
       xmlSpace="preserve"
+      
     >
       <g>
         <g id="Page-1" stroke="none" fillRule="evenodd">
@@ -180,5 +240,6 @@ export default function CatSprite() {
         </g>
       </g>
     </svg>
+    </div>
   );
 }
